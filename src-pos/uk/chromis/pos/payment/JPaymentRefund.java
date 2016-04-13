@@ -19,9 +19,11 @@
 
 package uk.chromis.pos.payment;
 
-import java.awt.Component;
 import uk.chromis.pos.customers.CustomerInfoExt;
 import uk.chromis.pos.forms.AppLocal;
+import uk.chromis.pos.ticket.TicketInfo;
+
+import java.awt.*;
 
 /**
  *
@@ -57,7 +59,12 @@ public class JPaymentRefund extends javax.swing.JPanel implements JPaymentInterf
         
         m_notifier.setStatus(true, true);
     }
-    
+
+    @Override
+    public void activate(TicketInfo ticketInfo) {
+
+    }
+
     /**
      *
      * @return

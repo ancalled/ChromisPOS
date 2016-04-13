@@ -20,89 +20,56 @@ package uk.chromis.pos.sales;
 
 import bsh.EvalError;
 import bsh.Interpreter;
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Component;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import static java.lang.Integer.parseInt;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.print.PrintService;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRMapArrayDataSource;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import uk.chromis.basic.BasicException;
 import uk.chromis.data.gui.ComboBoxValModel;
+import uk.chromis.data.gui.JMessageDialog;
 import uk.chromis.data.gui.ListKeyed;
 import uk.chromis.data.gui.MessageInf;
 import uk.chromis.data.loader.SentenceList;
 import uk.chromis.pos.customers.CustomerInfoExt;
 import uk.chromis.pos.customers.DataLogicCustomers;
 import uk.chromis.pos.customers.JCustomerFinder;
-import uk.chromis.pos.forms.AppConfig;
-import uk.chromis.pos.forms.AppLocal;
-import uk.chromis.pos.forms.AppView;
-import uk.chromis.pos.forms.BeanFactoryApp;
-import uk.chromis.pos.forms.BeanFactoryException;
-import uk.chromis.pos.forms.DataLogicSales;
-import uk.chromis.pos.forms.DataLogicSystem;
-import uk.chromis.pos.forms.JPanelView;
-import uk.chromis.pos.forms.JRootApp;
+import uk.chromis.pos.forms.*;
 import uk.chromis.pos.inventory.TaxCategoryInfo;
 import uk.chromis.pos.panels.JProductFinder;
 import uk.chromis.pos.payment.JPaymentSelect;
 import uk.chromis.pos.payment.JPaymentSelectReceipt;
 import uk.chromis.pos.payment.JPaymentSelectRefund;
+import uk.chromis.pos.printer.DeviceDisplayAdvance;
 import uk.chromis.pos.printer.TicketParser;
 import uk.chromis.pos.printer.TicketPrinterException;
+import uk.chromis.pos.promotion.DataLogicPromotions;
+import uk.chromis.pos.promotion.PromotionSupport;
 import uk.chromis.pos.sales.restaurant.RestaurantDBUtils;
 import uk.chromis.pos.scale.ScaleException;
 import uk.chromis.pos.scripting.ScriptEngine;
 import uk.chromis.pos.scripting.ScriptException;
 import uk.chromis.pos.scripting.ScriptFactory;
-import uk.chromis.pos.ticket.ProductInfoExt;
-import uk.chromis.pos.ticket.TaxInfo;
-import uk.chromis.pos.ticket.TicketInfo;
-import uk.chromis.pos.ticket.TicketLineInfo;
-import uk.chromis.pos.ticket.TicketTaxInfo;
+import uk.chromis.pos.ticket.*;
 import uk.chromis.pos.util.AltEncrypter;
+import uk.chromis.pos.util.AutoLogoff;
 import uk.chromis.pos.util.JRPrinterAWT300;
 import uk.chromis.pos.util.ReportUtils;
-import javax.swing.event.ListSelectionListener;
+
+import javax.print.PrintService;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
-import uk.chromis.data.gui.JMessageDialog;
-import uk.chromis.pos.printer.DeviceDisplayAdvance;
-import uk.chromis.pos.ticket.TicketType;
-import uk.chromis.pos.promotion.DataLogicPromotions;
-import uk.chromis.pos.promotion.PromotionSupport;
-import uk.chromis.pos.util.AutoLogoff;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.SourceDataLine;
-import uk.chromis.pos.ticket.PlayWave;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static java.lang.Integer.parseInt;
 
 public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFactoryApp, TicketsEditor {
 
@@ -1537,7 +1504,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
 
                     paymentdialog.setTransactionID(ticket.getTransactionID());
 
-                    if (paymentdialog.showDialog(ticket.getTotal(), ticket.getCustomer())) {
+                    if (paymentdialog.showDialog(ticket)) {
 
                         // assign the payments selected and calculate taxes.         
                         ticket.setPayments(paymentdialog.getSelectedPayments());

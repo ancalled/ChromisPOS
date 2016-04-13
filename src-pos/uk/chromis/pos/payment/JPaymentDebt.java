@@ -18,13 +18,15 @@
 //    along with Chromis POS.  If not, see <http://www.gnu.org/licenses/>.
 package uk.chromis.pos.payment;
 
-import java.awt.Component;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import uk.chromis.format.Formats;
 import uk.chromis.pos.customers.CustomerInfoExt;
 import uk.chromis.pos.forms.AppLocal;
+import uk.chromis.pos.ticket.TicketInfo;
 import uk.chromis.pos.util.RoundUtils;
+
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  *
@@ -98,6 +100,11 @@ public class JPaymentDebt extends javax.swing.JPanel implements JPaymentInterfac
         }
 
         printState();
+
+    }
+
+    @Override
+    public void activate(TicketInfo ticketInfo) {
 
     }
 

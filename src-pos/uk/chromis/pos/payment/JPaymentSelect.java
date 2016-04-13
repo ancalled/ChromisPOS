@@ -18,24 +18,19 @@
 //    along with Chromis POS.  If not, see <http://www.gnu.org/licenses/>.
 package uk.chromis.pos.payment;
 
-import java.awt.Component;
-import java.awt.ComponentOrientation;
-import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Toolkit;
-import java.awt.Window;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import uk.chromis.format.Formats;
 import uk.chromis.pos.customers.CustomerInfoExt;
 import uk.chromis.pos.forms.AppConfig;
 import uk.chromis.pos.forms.AppLocal;
 import uk.chromis.pos.forms.AppView;
 import uk.chromis.pos.forms.DataLogicSystem;
+import uk.chromis.pos.ticket.TicketInfo;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public abstract class JPaymentSelect extends javax.swing.JDialog
         implements JPaymentNotifier {
@@ -44,6 +39,7 @@ public abstract class JPaymentSelect extends javax.swing.JDialog
     private boolean printselected;
     private boolean accepted;
     private AppView app;
+    private TicketInfo ticketInfo;
     private double m_dTotal;
     private CustomerInfoExt customerext;
     private DataLogicSystem dlSystem;
@@ -126,6 +122,30 @@ public abstract class JPaymentSelect extends javax.swing.JDialog
         return accepted;
     }
 
+    public boolean showDialog(TicketInfo ticket) {
+
+        m_aPaymentInfo = new PaymentInfoList();
+        accepted = false;
+        ticketInfo = ticket;
+
+        setPrintSelected(!Boolean.parseBoolean(AppConfig.getInstance().getProperty("till.receiptprintoff")));
+        m_jButtonPrint.setSelected(printselected);
+        m_jTotalEuros.setText(Formats.CURRENCY.formatValue(m_dTotal));
+        addTabs();
+        getRootPane().setDefaultButton(m_jButtonOK);
+        printState();
+        Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension thisDim = this.getSize();
+        int x = (screenDim.width - thisDim.width) / 2;
+        int y = (screenDim.height - thisDim.height) / 2;
+        this.setLocation(x, y);
+
+        setVisible(true);
+        printselected = m_jButtonPrint.isSelected();
+        m_jTabPayment.removeAll();
+        return accepted;
+    }
+
     protected abstract void addTabs();
 
     protected abstract void setStatusPanel(boolean isPositive, boolean isComplete);
@@ -141,7 +161,7 @@ public abstract class JPaymentSelect extends javax.swing.JDialog
     }
 
     protected void addTabPayment(JPaymentCreator jpay) {
-        if (app.getAppUserView().getUser().hasPermission(jpay.getKey())) {
+//        if (app.getAppUserView().getUser().hasPermission(jpay.getKey())) {
 
             JPaymentInterface jpayinterface = payments.get(jpay.getKey());
             if (jpayinterface == null) {
@@ -154,7 +174,7 @@ public abstract class JPaymentSelect extends javax.swing.JDialog
                     AppLocal.getIntString(jpay.getLabelKey()),
                     new javax.swing.ImageIcon(getClass().getResource(jpay.getIconKey())),
                     jpayinterface.getComponent());
-        }
+//        }
     }
 
     public interface JPaymentCreator {
@@ -275,6 +295,29 @@ public abstract class JPaymentSelect extends javax.swing.JDialog
         @Override
         public String getLabelKey() {
             return "tab.free";
+        }
+
+        @Override
+        public String getIconKey() {
+            return "/uk/chromis/images/wallet.png";
+        }
+    }
+
+    public class JPaymentViaphoneCreator implements JPaymentCreator {
+
+        @Override
+        public JPaymentInterface createJPayment() {
+            return new JPaymentViaphone(JPaymentSelect.this);
+        }
+
+        @Override
+        public String getKey() {
+            return "payment.viaphone";
+        }
+
+        @Override
+        public String getLabelKey() {
+            return "tab.viaphone";
         }
 
         @Override
@@ -613,9 +656,13 @@ public abstract class JPaymentSelect extends javax.swing.JDialog
 
         if (m_jTabPayment.getSelectedComponent() != null) {
 //            ((JPaymentInterface) m_jTabPayment.getSelectedComponent()).activate(customerext, m_dTotal - m_aPaymentInfo.getTotal(), m_sTransactionID);
-            ((JPaymentInterface) m_jTabPayment.getSelectedComponent()).activate(customerext,
-                    m_dTotal - m_aPaymentInfo.getTotal(),
-                    m_sTransactionID);
+            if (m_jTabPayment.getSelectedComponent() instanceof JPaymentViaphone) {
+                ((JPaymentInterface) m_jTabPayment.getSelectedComponent()).activate(ticketInfo);
+            } else {
+                ((JPaymentInterface) m_jTabPayment.getSelectedComponent()).activate(customerext,
+                        m_dTotal - m_aPaymentInfo.getTotal(),
+                        m_sTransactionID);
+            }
         }
 
     }//GEN-LAST:event_m_jTabPaymentStateChanged
@@ -636,7 +683,7 @@ public abstract class JPaymentSelect extends javax.swing.JDialog
             m_aPaymentInfo.add(returnPayment);
             accepted = true;
 
-            dispose();
+//            dispose();
         }
     }//GEN-LAST:event_m_jButtonOKActionPerformed
 

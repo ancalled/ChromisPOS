@@ -18,13 +18,13 @@
 //    along with Chromis POS.  If not, see <http://www.gnu.org/licenses/>.
 package uk.chromis.pos.payment;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import javax.swing.JOptionPane;
 import uk.chromis.pos.customers.CustomerInfoExt;
 import uk.chromis.pos.forms.AppConfig;
 import uk.chromis.pos.forms.AppLocal;
 import uk.chromis.pos.forms.AppView;
+import uk.chromis.pos.ticket.TicketInfo;
+
+import java.awt.*;
 
 /**
  *
@@ -64,6 +64,11 @@ public class JPaymentMagcard extends javax.swing.JPanel implements JPaymentInter
             m_cardpanel.activate(transaction, dTotal);
             // The cardpanel sets the status
         }
+    }
+
+    @Override
+    public void activate(TicketInfo ticketInfo) {
+
     }
 
     @Override

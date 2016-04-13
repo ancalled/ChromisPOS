@@ -19,8 +19,10 @@
 
 package uk.chromis.pos.payment;
 
-import java.awt.Component;
 import uk.chromis.pos.customers.CustomerInfoExt;
+import uk.chromis.pos.ticket.TicketInfo;
+
+import java.awt.*;
 
 /**
  *
@@ -34,7 +36,9 @@ public interface JPaymentInterface {
      * @param dTotal
      * @param transactionID
      */
-    public void activate(CustomerInfoExt customerext, double dTotal, String transactionID);    
+    public void activate(CustomerInfoExt customerext, double dTotal, String transactionID);
+
+    public void activate(TicketInfo ticketInfo);
 
     /**
      *
