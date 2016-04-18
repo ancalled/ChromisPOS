@@ -1,8 +1,11 @@
 package uk.chromis.pos.payment;
 
+import com.viaphone.plugin.ResultListener;
 import com.viaphone.plugin.ViaphoneApi;
 import com.viaphone.plugin.model.CreateResp;
 import com.viaphone.plugin.model.Product;
+import com.viaphone.plugin.model.PurchaseStatus;
+import com.viaphone.plugin.model.PurchaseStatusResp;
 import com.viaphone.plugin.utils.Utils;
 import uk.chromis.pos.customers.CustomerInfoExt;
 import uk.chromis.pos.ticket.TicketInfo;
@@ -14,7 +17,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-public class JPaymentViaphone extends JPanel implements JPaymentInterface {
+public class JPaymentViaphone extends JPanel implements JPaymentInterface, ResultListener {
 
     private TicketInfo ticketInfo;
     private double m_dTotal;
@@ -45,7 +48,7 @@ public class JPaymentViaphone extends JPanel implements JPaymentInterface {
             String clientSecret = "3cfe5805-da51-4359-9db1-fc1754ee449f";
 
             try {
-                ViaphoneApi api = new ViaphoneApi(clientId, clientSecret);
+                ViaphoneApi api = new ViaphoneApi(clientId, clientSecret, this);
                 java.util.List<Product> items = new ArrayList<>();
 
                 for (TicketLineInfo item : ticketInfo.getLines()) {
@@ -53,7 +56,7 @@ public class JPaymentViaphone extends JPanel implements JPaymentInterface {
                             "lg", (int) item.getMultiply(), item.getPrice()));
                 }
 
-                CreateResp resp = api.createPayment(items);
+                CreateResp resp = api.createPurchase(items);
                 BufferedImage img = ImageIO.read(Utils.generateQr(resp.getToken()));
                 ImageIcon icon = new ImageIcon(img);
                 qr.setIcon(icon);
@@ -81,7 +84,7 @@ public class JPaymentViaphone extends JPanel implements JPaymentInterface {
         add(jLabel1);
 
         qr = new JLabel();
-        qr.setFont(new Font("Arial", 1, 36)); // NOI18N
+        qr.setFont(new Font("Arial", 1, 12)); // NOI18N
         qr.setHorizontalAlignment(SwingConstants.CENTER);
         qr.setText("QR here"); // NOI18N
         add(qr);
@@ -91,4 +94,25 @@ public class JPaymentViaphone extends JPanel implements JPaymentInterface {
 
     private JLabel jLabel1;
     private JLabel qr;
+
+    @Override
+    public void onAuthorized(double v) {
+        qr.setText("Purchase authorized with discount amount: " + v);
+        qr.setIcon(null);
+    }
+
+    @Override
+    public void onConfirmed(PurchaseStatus purchaseStatus) {
+        qr.setText("Purchase confirmed with status: " + purchaseStatus.name());
+    }
+
+    @Override
+    public void onCancel(PurchaseStatus purchaseStatus) {
+        qr.setText("Purchase canceled with status: " + purchaseStatus.name());
+    }
+
+    @Override
+    public void onError(PurchaseStatusResp.Status status) {
+        qr.setText("Ooops error: " + status.name());
+    }
 }
