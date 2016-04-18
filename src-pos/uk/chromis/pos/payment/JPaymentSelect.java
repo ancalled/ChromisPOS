@@ -688,7 +688,10 @@ public abstract class JPaymentSelect extends javax.swing.JDialog
     }//GEN-LAST:event_m_jButtonOKActionPerformed
 
     private void m_jButtonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_m_jButtonCancelActionPerformed
-
+        if (m_jTabPayment.getSelectedComponent() instanceof JPaymentViaphone) {
+            JPaymentViaphone jPaymentViaphone = (JPaymentViaphone) m_jTabPayment.getSelectedComponent();
+            jPaymentViaphone.viaphoneApi.stopExecutor();
+        }
         dispose();
 
     }//GEN-LAST:event_m_jButtonCancelActionPerformed

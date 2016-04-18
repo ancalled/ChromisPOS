@@ -22,6 +22,7 @@ public class JPaymentViaphone extends JPanel implements JPaymentInterface, Resul
     private TicketInfo ticketInfo;
     private double m_dTotal;
     private JPaymentNotifier m_notifier;
+    public ViaphoneApi viaphoneApi;
 
     public JPaymentViaphone(JPaymentNotifier notifier) {
         m_notifier = notifier;
@@ -48,7 +49,7 @@ public class JPaymentViaphone extends JPanel implements JPaymentInterface, Resul
             String clientSecret = "3cfe5805-da51-4359-9db1-fc1754ee449f";
 
             try {
-                ViaphoneApi api = new ViaphoneApi(clientId, clientSecret, this);
+                viaphoneApi = new ViaphoneApi(clientId, clientSecret, this);
                 java.util.List<Product> items = new ArrayList<>();
 
                 for (TicketLineInfo item : ticketInfo.getLines()) {
@@ -56,7 +57,7 @@ public class JPaymentViaphone extends JPanel implements JPaymentInterface, Resul
                             "lg", (int) item.getMultiply(), item.getPrice()));
                 }
 
-                CreateResp resp = api.createPurchase(items);
+                CreateResp resp = viaphoneApi.createPurchase(items);
                 BufferedImage img = ImageIO.read(Utils.generateQr(resp.getToken()));
                 ImageIcon icon = new ImageIcon(img);
                 qr.setIcon(icon);
