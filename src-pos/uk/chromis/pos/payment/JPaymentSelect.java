@@ -691,6 +691,9 @@ public abstract class JPaymentSelect extends javax.swing.JDialog
         if (m_jTabPayment.getSelectedComponent() instanceof JPaymentViaphone) {
             JPaymentViaphone jPaymentViaphone = (JPaymentViaphone) m_jTabPayment.getSelectedComponent();
             jPaymentViaphone.viaphoneApi.stopExecutor();
+            jPaymentViaphone.viaphoneApi.stopChirp();
+            jPaymentViaphone.qr.setIcon(null);
+            jPaymentViaphone.qr.setText(null);
         }
         dispose();
 

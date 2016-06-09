@@ -45,8 +45,8 @@ public class JPaymentViaphone extends JPanel implements JPaymentInterface, Resul
     @Override
     public PaymentInfo executePayment() {
         if (ticketInfo != null) {
-            String clientId = "ae99f6c6-52f2-4433-85b5-e81c31f5805f";
-            String clientSecret = "3cfe5805-da51-4359-9db1-fc1754ee449f";
+            String clientId = "6cb4cd53-10c2-4c2a-abc1-f007515acb09";
+            String clientSecret = "d2de319a-4613-4d71-8741-f801c5f15a54";
 
             try {
                 viaphoneApi = new ViaphoneApi(clientId, clientSecret, this);
@@ -58,6 +58,7 @@ public class JPaymentViaphone extends JPanel implements JPaymentInterface, Resul
                 }
 
                 CreateResp resp = viaphoneApi.createPurchase(items);
+                viaphoneApi.playChirp(resp.getToken());
                 BufferedImage img = ImageIO.read(Utils.generateQr(resp.getToken()));
                 ImageIcon icon = new ImageIcon(img);
                 qr.setIcon(icon);
@@ -89,17 +90,16 @@ public class JPaymentViaphone extends JPanel implements JPaymentInterface, Resul
         qr.setHorizontalAlignment(SwingConstants.CENTER);
         qr.setText("QR here"); // NOI18N
         add(qr);
-
-
     }
 
     private JLabel jLabel1;
-    private JLabel qr;
+    public JLabel qr;
 
     @Override
     public void onAuthorized(double v) {
         qr.setText("Purchase authorized with discount amount: " + v);
         qr.setIcon(null);
+        viaphoneApi.stopChirp();
     }
 
     @Override
