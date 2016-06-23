@@ -53,7 +53,7 @@ public class JPaymentViaphone extends JPanel implements JPaymentInterface, Resul
                 java.util.List<Product> items = new ArrayList<>();
 
                 for (TicketLineInfo item : ticketInfo.getLines()) {
-                    items.add(new Product(item.getProductName(), item.getProductCategoryID(),
+                    items.add(new Product(item.getBarcode(), item.getProductName(), item.getProductCategoryID(),
                             "Zanone", (int) item.getMultiply(), item.getPrice()));
                 }
 
