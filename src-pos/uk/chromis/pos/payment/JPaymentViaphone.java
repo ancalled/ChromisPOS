@@ -54,7 +54,7 @@ public class JPaymentViaphone extends JPanel implements JPaymentInterface, Resul
 
                 for (TicketLineInfo item : ticketInfo.getLines()) {
                     items.add(new Product(item.getProductName(), item.getProductCategoryID(),
-                            "lg", (int) item.getMultiply(), item.getPrice()));
+                            "Zanone", (int) item.getMultiply(), item.getPrice()));
                 }
 
                 CreateResp resp = viaphoneApi.createPurchase(items);
